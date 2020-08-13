@@ -13,9 +13,10 @@ multiqc Fastqc_files/ --ignore *_trim2_* && mv multiqc_data multiqc_R1_data && m
 multiqc Fastqc_files/ --ignore *_trim1_* && mv multiqc_data multiqc_R2_data && mv multiqc_report.html multiqc_report_R2.html #Reverse
 
 ## 2. ASSEMBLY, SCAFFOLDING, ANNOTATION
-
+unicycler -1 ${sample}_trim1.fastq -2 ${sample}_trim2.fastq -o assembly/${sample}_results
+prokka  --outdir prokka_results/${sample}_prokka_output assembly/${sample}_results/assembly.fasta
 ## 3. VARIANT CALLING
-
+snippy --outdir snippy_results/${sample}_snippy_results --ref reference.fna --ctgs assembly/${sample}_results/assembly.fasta 
 ## 4. AMR, VIRULENCE FACTORS, MLST AND PLASMIDS DETECTION
 
 ## 5. PANGENOME ANALYSIS
