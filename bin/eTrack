@@ -109,93 +109,93 @@ mkdir -p $OUTWD/{fastqc_files,annotation,mlsts,assembly,resistome,quality_assemb
 ls $INDIR >$OUTWD/temp.txt
 cat $OUTWD/temp.txt | cut -d. -f1 | rev | cut -c7- | rev | uniq >$OUTWD/list.txt
 rm -rf $OUTWD/temp.txt
-if [ -e "REFERENCE" ]; then
+# if [ -e "REFERENCE" ]; then
 
-    ## 1. QUALITY ASSESSMENT ##
-    gzip $INDIR/*.fastq
-    fastqc $INDIR/*.gz --outdir $OUTWD/fastqc_files
-    cd $OUTWD/fastqc_files
-    multiqc . --force --outdir .
-    rm -rf *.zip
-    echo -e "Quality assessment successfully completed"
-    cd
+## 1. QUALITY ASSESSMENT ##
+gzip $INDIR/*.fastq
+fastqc $INDIR/*.gz --outdir $OUTWD/fastqc_files
+cd $OUTWD/fastqc_files
+multiqc . --force --outdir .
+rm -rf *.zip
+echo -e "Quality assessment successfully completed"
+cd
 
-    ## 2. ASSEMBLY
-    for sample in $(cat $OUTWD/list.txt); do
-        mkdir -p $OUTWD/assembly/${sample}
-        X=${sample}_trim1.fastq.gz
-        Y=${sample}_trim2.fastq.gz
-        unicycler -1 $INDIR/$X -2 $INDIR/$Y -t $CPUS -o $OUTWD/assembly/${sample}
-    done
-    echo -e "Assembly successfully completed"
+## 2. ASSEMBLY
+for sample in $(cat $OUTWD/list.txt); do
+    mkdir -p $OUTWD/assembly/${sample}
+    X=${sample}_trim1.fastq.gz
+    Y=${sample}_trim2.fastq.gz
+    unicycler -1 $INDIR/$X -2 $INDIR/$Y -t $CPUS -o $OUTWD/assembly/${sample}
+done
+echo -e "Assembly successfully completed"
 
-    ## 3. ASSEMBLY QUALITY ASSESSMENT
-    for n in $(cat $OUTWD/list.txt); do
-        quast $OUTWD/assembly/${n}/${n}.fasta -o $OUTWD/quality_assembly/${n}_stats -t $CPUS --min-contig 200 --silent
-    done
-    echo -e "Quality stats for assembly completed"
+## 3. ASSEMBLY QUALITY ASSESSMENT
+for n in $(cat $OUTWD/list.txt); do
+    quast $OUTWD/assembly/${n}/${n}.fasta -o $OUTWD/quality_assembly/${n}_stats -t $CPUS --min-contig 200 --silent
+done
+echo -e "Quality stats for assembly completed"
 
-    ## 4. ANNOTATION
-    for x in $(cat $OUTWD/list.txt); do
-        mkdir -p $OUTWD/assembly/${x}
-        prokka --outdir $OUTWD/annotation/${x} --prefix ${x} $OUTWD/assembly/${x}/$x.fasta --cpus $CPUS --locustag $x
-    done
-    echo -e "Quality stats for assembly completed"
+## 4. ANNOTATION
+for x in $(cat $OUTWD/list.txt); do
+    mkdir -p $OUTWD/assembly/${x}
+    prokka --outdir $OUTWD/annotation/${x} --prefix ${x} $OUTWD/assembly/${x}/$x.fasta --cpus $CPUS --locustag $x
+done
+echo -e "Quality stats for assembly completed"
 
-    ## 5. AMR,PLASMIDS,VIRULENCE
-    ### amr
-    abricate --setupdb
-    for sample in $(cat $OUTWD/list.txt); do
-        mkdir -p $OUTWD/resistome/ABRICATE/${sample}
-        for i in resfinder card argannot ncbi; do
-            abricate $OUTWD/assembly/${sample}/${sample}.fasta --threads 8 --nopath --db $i >$OUTWD/resistome/ABRICATE/${sample}/$sample_$i.tab
-            abricate --summary $OUTWD/resistome/ABRICATE/${sample}/*.tab >$OUTWD/resistome/ABRICATE/${sample}/summary.tab
-        done
+## 5. AMR,PLASMIDS,VIRULENCE
+### amr
+abricate --setupdb
+for sample in $(cat $OUTWD/list.txt); do
+    mkdir -p $OUTWD/resistome/ABRICATE/${sample}
+    for i in resfinder card argannot ncbi; do
+        abricate $OUTWD/assembly/${sample}/${sample}.fasta --threads 8 --nopath --db $i >$OUTWD/resistome/ABRICATE/${sample}/$sample_$i.tab
+        abricate --summary $OUTWD/resistome/ABRICATE/${sample}/*.tab >$OUTWD/resistome/ABRICATE/${sample}/summary.tab
     done
-    ### plasmids and virulence factors
-    mkdir -p $OUTWD/resistome/virulence_factors
-    for sample in $(cat $OUTWD/list.txt); do
-        abricate $OUTWD/assembly/${sample}/${sample}.fasta --threads 8 --nopath --db vfdb >$OUTWD/resistome/virulence_factors/$sample.tab
-    done
-    abricate --summary $OUTWD/resistome/virulence_factors/*.tab >$OUTWD/resistome/virulence_factors/summary-vf.tab
-    ### ----------------------------------------------------------------------------------------------------------------
-    mkdir -p $OUTWD/resistome/plasmids
-    for sample in $(cat $OUTWD/list.txt); do
-        abricate $OUTWD/assembly/${sample}/${sample}.fasta --threads 8 --nopath --db plasmidfinder >$OUTWD/resistome/plasmids/$sample.tab
-    done
-    abricate --summary $OUTWD/resistome/plasmids/*.tab >$OUTWD/resistome/plasmids/summary-plasmids.tab
+done
+### plasmids and virulence factors
+mkdir -p $OUTWD/resistome/virulence_factors
+for sample in $(cat $OUTWD/list.txt); do
+    abricate $OUTWD/assembly/${sample}/${sample}.fasta --threads 8 --nopath --db vfdb >$OUTWD/resistome/virulence_factors/$sample.tab
+done
+abricate --summary $OUTWD/resistome/virulence_factors/*.tab >$OUTWD/resistome/virulence_factors/summary-vf.tab
+### ----------------------------------------------------------------------------------------------------------------
+mkdir -p $OUTWD/resistome/plasmids
+for sample in $(cat $OUTWD/list.txt); do
+    abricate $OUTWD/assembly/${sample}/${sample}.fasta --threads 8 --nopath --db plasmidfinder >$OUTWD/resistome/plasmids/$sample.tab
+done
+abricate --summary $OUTWD/resistome/plasmids/*.tab >$OUTWD/resistome/plasmids/summary-plasmids.tab
 
-    ### 6. MLSTS
-    mkdir -p $OUTWD/mlsts
-    for w in $(cat $OUTWD/list.txt); do
-        mlst --threads $CPUS $OUTWD/assembly/${w}/${w}.fasta >$OUTWD/mlsts/${w}_mlst.tsv
-    done
-    cat $OUTWD/mlsts/*.tsv >$OUTWD/mlsts/summary-mlst.tsv
+### 6. MLSTS
+mkdir -p $OUTWD/mlsts
+for w in $(cat $OUTWD/list.txt); do
+    mlst --threads $CPUS $OUTWD/assembly/${w}/${w}.fasta >$OUTWD/mlsts/${w}_mlst.tsv
+done
+cat $OUTWD/mlsts/*.tsv >$OUTWD/mlsts/summary-mlst.tsv
 
-    ## 7. VARIANT CALLING
-    mkdir -p $OUTWD/snps
-    for c in $(cat $OUTWD/list.txt); do
-        mkdir -p $OUTWD/snps/${c}
-        X=${sample}_trim1.fastq.gz
-        Y=${sample}_trim2.fastq.gz
-        snippy --cpus $CPUS --outdir $OUTWD/snps/${c} --ref $REFERENCE --R1 $INDIR/$X --R2 $INDIR/$Y
-    done
+## 7. VARIANT CALLING
+mkdir -p $OUTWD/snps
+for c in $(cat $OUTWD/list.txt); do
+    mkdir -p $OUTWD/snps/${c}
+    X=${sample}_trim1.fastq.gz
+    Y=${sample}_trim2.fastq.gz
+    snippy --cpus $CPUS --outdir $OUTWD/snps/${c} --ref $REFERENCE --R1 $INDIR/$X --R2 $INDIR/$Y
+done
 
-    ## 8. PANGENOME ANALYSIS
-    SVG_CONVERT="eTrackDIR/../files/roary2svg.pl"
-    CAIRO_SVG="$(which cairosvg)"
-    mkdir -p $OUTWD/gff
-    for c in $(cat $OUTWD/list.txt); do
-        cp -rf $OUTWD/annotation/${c}/${c}.gff $OUTWD/gff
-    done
-    roary -e -n -f $OUTWD/pangenome -p $CPUS $OUTWD/gff/*.gff
-    perl $SVG_CONVERT $OUTWD/pangenome/gene_presence_absence.csv --colour=Blue >$OUTWD/pangenome/pangenome.svg
-    $CAIRO_SVG $OUTWD/pangenome/pangenome.svg -o $OUTWD/pangenome/pangenome.png
-    rm -rf $OUTWD/gff
+## 8. PANGENOME ANALYSIS
+SVG_CONVERT="eTrackDIR/../files/roary2svg.pl"
+CAIRO_SVG="$(which cairosvg)"
+mkdir -p $OUTWD/gff
+for c in $(cat $OUTWD/list.txt); do
+    cp -rf $OUTWD/annotation/${c}/${c}.gff $OUTWD/gff
+done
+roary -e -n -f $OUTWD/pangenome -p $CPUS $OUTWD/gff/*.gff
+perl $SVG_CONVERT $OUTWD/pangenome/gene_presence_absence.csv --colour=Blue >$OUTWD/pangenome/pangenome.svg
+$CAIRO_SVG $OUTWD/pangenome/pangenome.svg -o $OUTWD/pangenome/pangenome.png
+rm -rf $OUTWD/gff
 
 ## 9. PHYLOGENETICS
 
 # ## REPORTING----- SHINNY APP
 # else
 #     echo "Wrong reference provided, please check!!\nProvide either a '.fasta' or '.gbk'"
-fi
+# fi
