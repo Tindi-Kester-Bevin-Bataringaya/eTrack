@@ -196,6 +196,6 @@ if [ -e "REFERENCE" ]; then
 ## 9. PHYLOGENETICS
 
 # ## REPORTING----- SHINNY APP
-else
-    echo "Wrong reference provided, please check!!\nProvide either a '.fasta' or '.gbk'"
+# else
+#     echo "Wrong reference provided, please check!!\nProvide either a '.fasta' or '.gbk'"
 fi
