@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #! /bin/bash
 # set -eu
 
@@ -200,59 +199,3 @@ if [ -e "REFERENCE" ]; then
 else
     echo "Wrong reference provided, please check!!\nProvide either a '.fasta' or '.gbk'"
 fi
-=======
-#! /bin/bash
-# set -eu
-
-## 0.SOFTWARE MENU------------------------------------------ ##########
-
-## 1. QUALITY CONTROL AND TRIMMING METHODS
-
-mkdir Fastqc_files # Create an output directory for the fastqc files
-fastqc data/*.fastq -o Fastqc_files # Run fastqc on all fastq files in the data directory
-
-## Perform multiqc for the Forward and Reverse Reads separately
-multiqc Fastqc_files/ --ignore *_trim2_* && mv multiqc_data multiqc_R1_data && mv multiqc_report.html multiqc_report_R1.html #Forward
-multiqc Fastqc_files/ --ignore *_trim1_* && mv multiqc_data multiqc_R2_data && mv multiqc_report.html multiqc_report_R2.html #Reverse
-
-## 2. ASSEMBLY, SCAFFOLDING, ANNOTATION
-
-
-## we use a for loop to run de novo assembly using unicycler tool, annotation, mlst and virulence for each sample
-
-for sample in `cat list.txt`
-do	## Do the assembly using the unicycler tool
-    mkdir assembly # Create an output directory for all the assembly output
-    unicycler -1 eanbit_amr/${sample}_trim1.fastq -2 eanbit_amr/${sample}_trim2.fastq -o assembly/${sample}_out
-
-	## check the quality of the assembly using quast tool for each sample
-	quast.py assembly/${sample}_out/assembly.fasta -o quality_assembly
-
-    ## Do the annotation with prokka using the assembled contigs
-    mkdir annotation # Create an output directory for all the annotation output
-    prokka --outdir annotation/${sample}_prokka_out /assembly/${sample}_out/assembly.fasta
-    
-    ## Do the Multi-locus Sequence typing with mlst using the assembled contigs
-    mkdir mlst # Create  an output directory for all the MLST out-put
-    mlst --csv --scheme ecoli assembly/${sample}_out/assembly.fasta  > mlst/${sample}_mlst.csv
-    
-    ## Concatenate all the "mlst csv files" into a single csv file
-    cat mlst/*.csv > mlst.csv
-
-    ## Do Virulence with abricate using the assembled contigs
-    mkdir Virulence #Create an output directory for all the Virulence output
-    abricate --csv --db vfdb assembly/${sample}_out/assembly.fasta > Virulence/${sample}_virulence.csv
-
-    ## Summarise all the abricate output into a single file
-    abricate --summary Virulence/*.csv > Virulence.csv
-done
-## 3. VARIANT CALLING
-snippy --outdir snippy_results/${sample}_snippy_results --ref reference.fna --ctgs assembly/${sample}_results/assembly.fasta 
-## 4. AMR, VIRULENCE FACTORS, MLST AND PLASMIDS DETECTION
-
-## 5. PANGENOME ANALYSIS
-
-## 6. PHYLOGENETICS
-
-## REPORTING
->>>>>>> b4c824eef14d13a7099aa57e036451e2c3f28cc8
