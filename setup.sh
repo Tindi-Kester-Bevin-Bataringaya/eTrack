@@ -1,7 +1,7 @@
 #! /bin/bash
 
 export PATH=~/miniconda3/bin:$PATH
-cp -rf config-files ../miniconda3/envs/eTrack-1.0/
+cp -rf files ../miniconda3/envs/eTrack-1.0/
 chmod 777 ../miniconda3/envs/eTrack-1.0/files/*
 cp -rf bin/eTrack ../miniconda3/envs/eTrack-1.0/bin/
 chmod 777 ../miniconda3/envs/eTrack-1.0/bin/eTrack
