@@ -34,8 +34,9 @@ The pipeline is able to perform the following:
    `conda activate eTrack-1.0`  
 4. List all the installed packages by running:
    `conda --list`  
-5. `bash setup.sh`  
-6. Run the command below to display the programs menu  
+   `bash setup.sh`  
+   `cd .. && bash cleanup.sh`  
+5. Run the command below to display the programs menu  
    `eTrack -h`  
 
 ## Menu snippets  
