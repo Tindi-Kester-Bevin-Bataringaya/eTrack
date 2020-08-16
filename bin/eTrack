@@ -109,7 +109,6 @@ mkdir -p $OUTWD/{fastqc_files,annotation,mlsts,assembly,resistome,quality_assemb
 ls $INDIR >$OUTWD/temp.txt
 cat $OUTWD/temp.txt | cut -d. -f1 | rev | cut -c7- | rev | uniq >$OUTWD/list.txt
 rm -rf $OUTWD/temp.txt
-# if [ -e "REFERENCE" ]; then
 
 ## 1. QUALITY ASSESSMENT ##
 gzip $INDIR/*.fastq
@@ -177,9 +176,9 @@ cat $OUTWD/mlsts/*.tsv >$OUTWD/mlsts/summary-mlst.tsv
 mkdir -p $OUTWD/snps
 for c in $(cat $OUTWD/list.txt); do
     mkdir -p $OUTWD/snps/${c}
-    X=${sample}_trim1.fastq.gz
-    Y=${sample}_trim2.fastq.gz
-    snippy --cpus $CPUS --outdir $OUTWD/snps/${c} --ref $REFERENCE --R1 $INDIR/$X --R2 $INDIR/$Y
+    X=${c}_trim1.fastq.gz
+    Y=${c}_trim2.fastq.gz
+    snippy --cpus $CPUS --outdir $OUTWD/snps/${c} --ref $REFERENCE --R1 $INDIR/$X --R2 $INDIR/$Y --force
 done
 
 ## 8. PANGENOME ANALYSIS
@@ -199,4 +198,3 @@ rm -rf $OUTWD/gff
 # ## REPORTING----- SHINNY APP
 # else
 #     echo "Wrong reference provided, please check!!\nProvide either a '.fasta' or '.gbk'"
-# fi
