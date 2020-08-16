@@ -14,6 +14,7 @@ multiqc Fastqc_files/ --ignore *_trim1_* && mv multiqc_data multiqc_R2_data && m
 
 ## 2. ASSEMBLY, SCAFFOLDING, ANNOTATION
 
+
 ## we use a for loop to run de novo assembly using unicycler tool, annotation, mlst and virulence for each sample
 
 for sample in `cat list.txt`
@@ -43,7 +44,7 @@ do	## Do the assembly using the unicycler tool
     abricate --summary Virulence/*.csv > Virulence.csv
 done
 ## 3. VARIANT CALLING
-
+snippy --outdir snippy_results/${sample}_snippy_results --ref reference.fna --ctgs assembly/${sample}_results/assembly.fasta 
 ## 4. AMR, VIRULENCE FACTORS, MLST AND PLASMIDS DETECTION
 
 ## 5. PANGENOME ANALYSIS
