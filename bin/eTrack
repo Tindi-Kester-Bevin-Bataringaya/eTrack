@@ -126,6 +126,7 @@ for sample in $(cat $OUTWD/list.txt); do
     X=${sample}_trim1.fastq.gz
     Y=${sample}_trim2.fastq.gz
     unicycler -1 $INDIR/$X -2 $INDIR/$Y -t $CPUS -o $OUTWD/assembly/${sample}
+    mv $OUTWD/assembly/${sample}/assembly.fasta $OUTWD/assembly/${sample}/${sample}.fasta
 done
 echo -e "Assembly successfully completed"
 
