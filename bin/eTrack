@@ -195,14 +195,15 @@ rm -rf $OUTWD/gff
 
 ## 9. PHYLOGENETICS
 
-for i in `ls -1 Assembly_data/*_data/*.fasta | sed 's/\.fasta//'`; do cp $i\.fasta Phylogeny/; done
-cd Phylogeny/
-for i in *.fasta; do awk '/^>/ {gsub(/.fa(sta)?$/,"",FILENAME);printf(">%s\n",FILENAME);next;} {print}' $i > $i.adjusted; done
-cat *.adjusted > Ecoli_Assemblies_combined.fasta
-sed '/^>/s/ *//' Ecoli_Assemblies_combined.fasta > Ec_edit.fasta | awk 'BEGIN{FS=OFS=">"}NF>1{$3="_sequence_"++i}1' Ec_edit.fasta > EC.fasta
+for i in $(cat $OUTWD/list.txt); do cp $OUTWD/assembly/${i}/${i}.fasta phylogenetics/; done
+cd phylogenetics/
+for i in *.fasta; do awk '/^>/ {gsub(/.fa(sta)?$/,"",FILENAME);printf(">%s\n",FILENAME);next;} {print}' $i > $i.adjusted; awk 'BEGIN{FS=OFS=">"}NF>1{$3="_sequence_"++i}1' $i.adjusted > $i.changed; done
+cat *.changed > EC.fasta
+rm *.adjusted *.changed
+#clustalw -align -type=dna -infile=EC.fasta
+mafft --auto EC.fasta > EC.fasta
+iqtree -s EC.aln 
 cd ..
-clustalw -align -type=dna -infile=Phylogeny/EC.fasta
-iqtree -s Phylogeny/EC.aln 
 
 # ## REPORTING----- SHINNY APP
 # else
