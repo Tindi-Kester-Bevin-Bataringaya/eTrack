@@ -182,7 +182,7 @@ for c in $(cat $OUTWD/list.txt); do
 done
 
 ## 8. PANGENOME ANALYSIS
-SVG_CONVERT="eTrackDIR/../files/roary2svg.pl"
+SVG_CONVERT="$eTrackDIR/../files/roary2svg.pl"
 CAIRO_SVG="$(which cairosvg)"
 mkdir -p $OUTWD/gff
 for c in $(cat $OUTWD/list.txt); do
