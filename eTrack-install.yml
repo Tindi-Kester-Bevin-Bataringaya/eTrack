@@ -27,3 +27,5 @@ dependencies:
   - r-reshape2
   - r-ggplot2
   - r-dplyr
+  - mafft=7.407
+  - raxml
