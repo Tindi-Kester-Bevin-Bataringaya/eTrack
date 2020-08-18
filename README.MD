@@ -1,8 +1,22 @@
-# Tracing Origins and Transmission Dynamics of Antimicrobial Resistance in E. Coli WGS data
+# Tracing Origins and Transmission Dynamics of Antimicrobial Resistance in E. Coli Whole Genome Sequence data
 
 ## Introduction
 
-Antimicrobial resistance happens when microorganisms (such as bacteria, fungi, viruses, and parasites) change when they are exposed to antimicrobial drugs (such as antibiotics, antifungals, antivirals, antimalarials, and anthelmintics). The overwhelming generation of sequencing data has led to the evolution of prescision medicine. However, there is still a shortage of Bioinformatics skilled people to make sense out of this data  
+Antimicrobial resistance happens when microorganisms (such as bacteria, fungi, viruses, and parasites) change when they are exposed to antimicrobial drugs (such as antibiotics, antifungals, antivirals, antimalarials, and anthelmintics). 
+
+Antimicrobial resistance occurs naturally over time, usually through genetic changes. However, the misuse and overuse of antimicrobials is accelerating this process. 
+In many places, antibiotics are overused and misused in people and animals, and often given without professional oversight. Examples of misuse include when they are taken by people with viral infections like colds and flu, and when they are given as growth promoters in animals or used to prevent diseases in healthy animals.
+
+Antimicrobial resistant-microbes are found in people, animals, food, and the environment (in water, soil and air). They can spread between people and animals, including from food of animal origin, and from person to person. 
+Poor infection control, inadequate sanitary conditions and inappropriate food-handling encourage the spread of antimicrobial resistance.
+
+Little effort has been devoted to determining the molecular epidemiology of antimicrobial resistance, including multidrug resistance at a human-animal interface. Pastoralist communities live with their domestic animals hence a porous interface for microbial and disease transmission. The aim of this study is to determine the molecular epidemiology of antimicrobial resistance at a human-animal interface among pastoralist communities.
+
+The overwhelming generation of sequencing data has led to the evolution of prescision medicine. However, there is still a shortage of Bioinformatics skilled people to make sense out of this data  
+
+## Samples
+
+42 E. coli bacterial isolates from multidrug resistant bacteria isolated from stool samples from both humans and cattle in pastoralist communities were sequenced on Illumina Miseq with an output of 2 x 200bp.
 
 ## Sypnosis
 
@@ -33,7 +47,7 @@ The pipeline is able to perform the following:
 3. When installation is successful, run:  
    `conda activate eTrack-1.0`  
 4. List all the installed packages by running:
-   `conda --list`  
+   `conda list`  
    `bash setup.sh`  
    `cd .. && bash cleanup.sh`  
 5. Run the command below to display the programs menu  
